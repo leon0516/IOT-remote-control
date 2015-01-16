@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39" />
+    <title>LED Remote Control</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css" />
+  </head>
+  
+   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="http://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script> 
+  <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <script src="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
+  
+  <script>
+  $(document).ready(function(){
+    // 更新表格
+    updateAll();
+    
+    function updateAll() {
+    // 动态表格内容
+    $.getJSON('/api/leds',function(data){
+      
+      // data.total 表示记录总数
+      // data.row   表示记录内容
+      console.log(data.total);
+      
+      $.each(data.rows, function(index, item){
+        // 取出 id description status
+        var id = item.id;                   console.log(id);
+        var description = item.description; console.log(description);
+        var status = item.status;           console.log(status); console.log(status);
+     
+        var btnStyle = 'btn-success';
+        var btnText;
+
+        // 修改按钮样式，ON为绿色 OFF为白色
+        if( status == 'on'){
+          btnStyle = 'btn-success';
+          btnText = 'O N';
+        } else {
+          btnStyle = 'btn-danger';
+          btnText = 'OFF';
+        }      
+        
+        // 插入一行，很遗憾 javascript没有 format
+        var newRow = '<tr dev_id="' + id + '">' + 
+              '<td>' + id + '</td>' + 
+              '<td>' + description + '</td>' +
+              '<td>' + status + '</td>' +
+              '<td>' + 
+                '<button type="button" class="btn btn-xs ' + btnStyle + '">' + btnText + '</button>' + 
+              '</td>' +
+            '</tr>';
+        $('#ledsTable').append(newRow);
+        
+      });
+      
+    });
+    }
+    
+    //$("button").on("click",function(){
+    //$('.button').click( function(){
+    
+    // 尝试了很多方法，只有委托有效
+    $("table").delegate("button", "click", function(){
+    
+      console.info($(this)); 
+
+      // 尝试获得 <button>text</button>
+      console.log($(this).text());
+      var $tr_obj = $(this).parent().parent();
+      
+      // tr元素中包含 dev_id属性
+      var dev_id = $tr_obj.attr('dev_id');
+      console.log( dev_id );
+      
+      // 访问该tr元素的所有子td元素
+      var $td_obj = $($tr_obj).children("td");
+    
+      // 所有td元素的第二个
+      var $status_obj = $($td_obj).eq(2);
+      var status_str = $status_obj.text();
+      console.log(status_str);
+      
+      // 改变按钮样式
+      if( status_str == "on"){
+        $(this).removeClass('btn-success');$(this).addClass('btn-danger');
+        $(this).text("OFF");
+        $status_obj.text("off");
+        send_ledctrl( dev_id , "off");
+      }else{
+        $(this).removeClass('btn-danger');$(this).addClass('btn-success');
+        $(this).text("O N");
+        $status_obj.text("on");
+        send_ledctrl( dev_id , "on" );
+      }
+      
+    });
+    
+    function send_ledctrl(dev_id, cur_status){
+      $.ajax({
+        url: '/api/leds/' + dev_id + '/status',   // /api/leds/1
+        async: true,
+        dataType: 'json',
+        type: 'PUT',
+        data: JSON.stringify({status:cur_status}),
+        
+        success: function(data, textStatus){
+          // 打印返回内容 {"success":true}
+          console.log(data.success);
+        },
+        
+        error: function(jqXHR, textStatus, errorThrown){
+          console.log("error");
+        },
+        
+      });
+    }
+
+  });
+  </script> 
+  
+  <body>
+  <div class="container">
+    <div class="row">
+      <div class="span12">
+        <p class="lead"><a href="#">IoT-Ctrl</a></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span12">
+        <table class="table table-hover" id="ledsTable">
+          <thead>
+            <tr>
+              <th>编号 ID</th>
+              <th>描述 DESC</th>
+              <th>状态 STATUS</th>
+              <th>动作 ACTION</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+  </body>
+</html>

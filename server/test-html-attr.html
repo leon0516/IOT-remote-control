@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<script src="jquery.js"></script>
+<script>
+function setURLByJS() {
+    var inputurl = document.getElementById("input-url").value;
+    document.getElementById("url").href = inputurl;
+}
+
+function getURLByJS() {
+    var url = document.getElementById("url").href;
+    alert(url);  
+}
+
+function setURLNameByJS() {
+    var urlname = document.getElementById("input-urlname").value;
+    document.getElementById("url").innerHTML = urlname;
+}
+
+function getURLNameByJS() {
+    var urlname = document.getElementById("url").innerHTML;
+    alert(urlname);
+}
+
+function setURLByJQuery() {
+    var url = $("#input-url").val();
+    $("#url").attr("href", url);
+}
+
+function getURLByJQuery() {
+    var url = $("#url").attr("href");
+    alert(url);
+}
+
+function setURLNameByJQuery() {
+    var urlname = $("#input-urlname").val();
+    $("#url").html(urlname);
+}
+
+function getURLNameByJQuery() {
+    var urlname = $("#url").html();
+    alert(urlname);
+}
+</script>
+</head>
+<body>
+<a id="url" href="#">URL name</a>
+<br>
+URL:<input type="text" id="input-url"  size="35" value="#">
+URL Name:<input type="text" id="input-urlname"  size="25" value="博客">
+<br>
+<p>javascript操作</p>
+<button type="button" onclick="setURLByJS()">设置URL</button>
+<button type="button" onclick="getURLByJS()">读取URL</button>
+<button type="button" onclick="setURLNameByJS()">设置URL Name</button>
+<button type="button" onclick="getURLNameByJS()">读取URL Name</button>
+<br>
+<p>JQuery操作</p>
+<button type="button" onclick="setURLByJQuery()">设置URL</button>
+<button type="button" onclick="getURLByJQuery()">读取URL</button>
+<button type="button" onclick="setURLNameByJQuery()">设置URL Name</button>
+<button type="button" onclick="getURLNameByJQuery()">读取URL Name</button>
+</body>
+</html>
